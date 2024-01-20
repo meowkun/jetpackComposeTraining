@@ -1,7 +1,6 @@
 package com.example.jetpackcomposetraining.profile_card
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -31,9 +32,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.example.jetpackcomposetraining.profile_card.Status.*
 import com.example.jetpackcomposetraining.ui.theme.ProfileCardTheme
 import com.example.jetpackcomposetraining.ui.theme.lightGreen
@@ -49,11 +50,9 @@ fun ProfileCardMainScreen() {
                     .padding(padding)
                     .fillMaxSize()
             ) {
-                Column {
-                    for (user in userProfileList) {
-                        ProfileCard(
-                            userProfile = user
-                        )
+                LazyColumn {
+                    items(userProfileList) {userprofile ->
+                        ProfileCard(userProfile = userprofile)
                     }
                 }
             }
@@ -102,7 +101,7 @@ fun ProfileCard(userProfile: UserProfile) {
             horizontalArrangement = Arrangement.Start
         ) {
             ProfilePicture(
-                iconId = userProfile.iconId,
+                imageUrl = userProfile.imageUrl,
                 status = userProfile.status
             )
             ProfileContent(
@@ -115,7 +114,7 @@ fun ProfileCard(userProfile: UserProfile) {
 }
 
 @Composable
-fun ProfilePicture(iconId: Int, status: Status) {
+fun ProfilePicture(imageUrl: String, status: Status) {
     Card(
         shape = CircleShape,
         border = BorderStroke(
@@ -128,10 +127,10 @@ fun ProfilePicture(iconId: Int, status: Status) {
         modifier = Modifier.padding(16.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
-        Image(
-            painter = painterResource(id = iconId),
-            contentDescription = "Profile image",
+        AsyncImage(
+            model = imageUrl,
             modifier = Modifier.size(72.dp),
+            contentDescription = "Profile picture description",
             contentScale = ContentScale.Crop
         )
     }

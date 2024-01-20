@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.example.jetpackcomposetraining.profile_card.ProfileCardMainScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,5 +23,6 @@ fun MainScreen() {
     Surface(
         modifier = Modifier.fillMaxSize()
     ) {
+        ProfileCardMainScreen()
     }
 }
