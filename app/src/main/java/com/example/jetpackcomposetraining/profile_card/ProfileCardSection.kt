@@ -1,6 +1,8 @@
 package com.example.jetpackcomposetraining.profile_card
 
+import android.service.autofill.OnClickAction
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,9 +33,12 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.jetpackcomposetraining.profile_card.Status.*
 import com.example.jetpackcomposetraining.ui.theme.ProfileCardTheme
@@ -42,17 +47,26 @@ import com.example.jetpackcomposetraining.ui.theme.shapes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileCardMainScreen() {
+fun ProfileCardMainScreen(
+    navController: NavController?
+) {
     ProfileCardTheme {
-        Scaffold(topBar = { ProfileCardAppBar() }) { padding ->
+        Scaffold(topBar = {
+            ProfileCardAppBar(
+                title = "User List",
+                icon = Icons.Default.Home
+            ) { }
+        }) { padding ->
             Surface(
                 modifier = Modifier
                     .padding(padding)
                     .fillMaxSize()
             ) {
                 LazyColumn {
-                    items(userProfileList) {userprofile ->
-                        ProfileCard(userProfile = userprofile)
+                    items(userProfileList) { userprofile ->
+                        ProfileCard(userProfile = userprofile) {
+                            navController?.navigate("user_details/${userprofile.userId}")
+                        }
                     }
                 }
             }
@@ -62,23 +76,30 @@ fun ProfileCardMainScreen() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileCardAppBar() {
+fun ProfileCardAppBar(
+    title: String,
+    icon: ImageVector,
+    onClick: () -> Unit
+) {
     TopAppBar(
         navigationIcon = {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = { onClick() }) {
                 Icon(
-                    imageVector = Icons.Default.Home,
-                    contentDescription = "Home button"
+                    imageVector = icon,
+                    contentDescription = "Top bar icon"
                 )
             }
         },
-        title = { Text(text = "Messaging Application Users") },
+        title = { Text(text = title) },
         colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
     )
 }
 
 @Composable
-fun ProfileCard(userProfile: UserProfile) {
+fun ProfileCard(
+    userProfile: UserProfile,
+    clickAction: () -> Unit
+) {
     Card(
         modifier = Modifier
             .padding(
@@ -88,7 +109,8 @@ fun ProfileCard(userProfile: UserProfile) {
                 end = 16.dp
             )
             .fillMaxWidth()
-            .wrapContentHeight(align = Alignment.Top),
+            .wrapContentHeight(align = Alignment.Top)
+            .clickable { clickAction.invoke() },
         shape = shapes.medium,
         elevation = CardDefaults.cardElevation(8.dp),
         colors = CardDefaults.cardColors(
@@ -109,12 +131,15 @@ fun ProfileCard(userProfile: UserProfile) {
                 status = userProfile.status
             )
         }
-
     }
 }
 
 @Composable
-fun ProfilePicture(imageUrl: String, status: Status) {
+fun ProfilePicture(
+    imageUrl: String,
+    status: Status,
+    imageSize: Dp = 72.dp
+) {
     Card(
         shape = CircleShape,
         border = BorderStroke(
@@ -129,7 +154,7 @@ fun ProfilePicture(imageUrl: String, status: Status) {
     ) {
         AsyncImage(
             model = imageUrl,
-            modifier = Modifier.size(72.dp),
+            modifier = Modifier.size(imageSize),
             contentDescription = "Profile picture description",
             contentScale = ContentScale.Crop
         )
@@ -140,8 +165,8 @@ fun ProfilePicture(imageUrl: String, status: Status) {
 fun ProfileContent(userName: String, status: Status) {
     Column(
         modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         CompositionLocalProvider(
             LocalContentColor provides MaterialTheme.colorScheme.onSurface.copy(
@@ -172,5 +197,5 @@ fun ProfileContent(userName: String, status: Status) {
 @Preview(showBackground = true)
 @Composable
 fun ProfileCardSectionPreview() {
-    ProfileCardMainScreen()
+    ProfileCardMainScreen(null)
 }
